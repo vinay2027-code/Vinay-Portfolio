@@ -24,8 +24,8 @@ export const InteractiveStickers: React.FC = () => {
           <div className="w-8 h-8 rounded-full bg-amber-400 text-black flex items-center justify-center mx-auto mb-1 shadow-md">
             <Trophy className="w-4 h-4 text-amber-900" />
           </div>
-          <span className="block text-amber-700">DISTRICT GOLD</span>
-          <span className="text-[8px] text-neutral-600 block">100m & 200m</span>
+          <span className="block text-amber-700">DISTRICT & STATE</span>
+          <span className="text-[8px] text-neutral-600 block">100m, 200m Gold • 400m Silver</span>
         </div>
       </div>
 

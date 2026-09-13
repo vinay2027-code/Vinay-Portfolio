@@ -6,14 +6,13 @@ interface AtulNavPillProps {
   activeSection: string;
   onNavigate: (sectionId: string) => void;
   onOpenResumeModal: () => void;
-  onOpenPhotoModal: () => void;
+  onOpenPhotoModal?: () => void;
 }
 
 export const AtulNavPill: React.FC<AtulNavPillProps> = ({
   activeSection,
   onNavigate,
   onOpenResumeModal,
-  onOpenPhotoModal,
 }) => {
   const [soundOn, setSoundOn] = useState<boolean>(isSoundEnabled());
 
@@ -86,18 +85,6 @@ export const AtulNavPill: React.FC<AtulNavPillProps> = ({
         >
           <FileText className="w-3 h-3 text-[#ffe600]" />
           <span className="hidden md:inline">RESUME</span>
-        </button>
-
-        <button
-          onClick={() => {
-            playMechanicalClick(1100, 0.02);
-            onOpenPhotoModal();
-          }}
-          className="px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center gap-1 text-[11px] transition-all"
-          title="Upload or Change Studio Photos"
-        >
-          <Camera className="w-3 h-3 text-emerald-400" />
-          <span className="hidden md:inline">PHOTO</span>
         </button>
 
         {/* Sound toggle like Atul Khola's */}

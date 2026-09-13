@@ -82,7 +82,7 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({
               <span>•</span>
               <span className="flex items-center gap-1">
                 <Linkedin className="w-3 h-3 text-[#D97706]" />
-                <a href={profile.linkedin} target="_blank" rel="noreferrer" className="hover:underline text-neutral-800">linkedin.com/in/vinay-g</a>
+                <a href={profile.linkedin} target="_blank" rel="noreferrer" className="hover:underline text-neutral-800">linkedin.com/in/vinay-g-7233b522b</a>
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">

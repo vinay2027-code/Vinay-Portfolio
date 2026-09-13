@@ -129,7 +129,7 @@ export const EasyBillShowcase: React.FC = () => {
   );
 
   return (
-    <div className="bg-[#071911] border-2 border-[#ffe600]/30 rounded-3xl p-6 sm:p-10 mb-10 shadow-2xl relative overflow-hidden">
+    <div className="bg-[#071911] border-2 border-[#ffe600]/30 rounded-2xl p-5 sm:p-7 mb-2 shadow-2xl relative overflow-hidden">
       
       {/* Top Header Badge Strip */}
       <div className="flex items-center justify-between pb-6 mb-6 border-b border-white/10 flex-wrap gap-3">

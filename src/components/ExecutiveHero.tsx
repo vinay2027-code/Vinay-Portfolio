@@ -101,8 +101,8 @@ export const ExecutiveHero: React.FC<ExecutiveHeroProps> = ({
                   <Trophy className="w-3 h-3 text-amber-400" />
                   <span>ATHLETIC HONORS</span>
                 </div>
-                <div className="text-xl font-bold font-mono-code text-white mt-1">GOLD</div>
-                <div className="text-[11px] text-neutral-400">District 100m & 200m</div>
+                <div className="text-xl font-bold font-mono-code text-white mt-1">PODIUM</div>
+                <div className="text-[11px] text-neutral-400">100m, 200m Gold • 400m State Silver</div>
               </div>
 
               <div className="bg-[#181C24] border border-white/10 rounded-xl p-3 hover:border-rose-400/40 transition-colors">

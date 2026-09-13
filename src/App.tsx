@@ -9,7 +9,8 @@ import { ContactChapter } from './components/AtulKhola/ContactChapter';
 import { InteractiveStickers } from './components/AtulKhola/InteractiveStickers';
 
 import { ResumeModal } from './components/ResumeModal';
-import { PhotoUploadModal } from './components/PhotoUploadModal';
+import { SecretAdminModal } from './components/SecretAdminModal';
+import { getStoredDossierPhoto } from './utils/photoStorage';
 
 import { ATHLETE_PHOTOS } from './data/heroData';
 import { 
@@ -20,23 +21,9 @@ import {
 import { AthletePhoto, UserProfile, ProjectItem, ExperienceItem } from './types';
 
 export default function App() {
-  // Photos with LocalStorage Persistence
-  const [photosList, setPhotosList] = useState<AthletePhoto[]>(() => {
-    try {
-      const saved = localStorage.getItem('vinay_portfolio_photos');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.some(p => p.id === 'vinay-executive-suit')) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      console.warn('LocalStorage read error:', e);
-    }
-    return ATHLETE_PHOTOS;
-  });
-
-  const [activePhotoId, setActivePhotoId] = useState<string>('vinay-executive-suit');
+  const [photosList] = useState<AthletePhoto[]>(ATHLETE_PHOTOS);
+  const [activePhotoId] = useState<string>('vinay-executive-suit');
+  const [customPhotoUrl, setCustomPhotoUrl] = useState<string | null>(null);
 
   const [activeSection, setActiveSection] = useState<string>('about');
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
@@ -45,16 +32,65 @@ export default function App() {
 
   // Modals state
   const [isResumeModalOpen, setIsResumeModalOpen] = useState<boolean>(false);
-  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState<boolean>(false);
+  const [isSecretAdminOpen, setIsSecretAdminOpen] = useState<boolean>(false);
 
-  // Save custom photos to localStorage
+  // Hidden admin access: URL hash (#admin) or keyboard shortcut (Ctrl+Shift+U or Cmd+Shift+U)
   useEffect(() => {
-    try {
-      localStorage.setItem('vinay_portfolio_photos', JSON.stringify(photosList));
-    } catch (e) {
-      console.warn('LocalStorage save error:', e);
-    }
-  }, [photosList]);
+    const checkAdminTrigger = () => {
+      if (
+        window.location.hash.toLowerCase() === '#admin' ||
+        window.location.search.includes('admin=true') ||
+        window.location.search.includes('admin=1')
+      ) {
+        setIsSecretAdminOpen(true);
+      }
+    };
+
+    checkAdminTrigger();
+    window.addEventListener('hashchange', checkAdminTrigger);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Shift+U or Cmd+Shift+U (Upload) or Ctrl+Shift+A (Admin)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key.toLowerCase() === 'u' || e.key.toLowerCase() === 'a')) {
+        e.preventDefault();
+        setIsSecretAdminOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('hashchange', checkAdminTrigger);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Check for custom stored dossier photo on startup
+  useEffect(() => {
+    getStoredDossierPhoto().then((meta) => {
+      if (meta?.dataUrl) {
+        setCustomPhotoUrl(meta.dataUrl);
+      }
+    });
+
+    const handlePhotoUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.dataUrl) {
+        setCustomPhotoUrl(customEvent.detail.dataUrl);
+      }
+    };
+
+    const handlePhotoCleared = () => {
+      setCustomPhotoUrl(null);
+    };
+
+    window.addEventListener('vinay_dossier_photo_updated', handlePhotoUpdated);
+    window.addEventListener('vinay_dossier_photo_cleared', handlePhotoCleared);
+
+    return () => {
+      window.removeEventListener('vinay_dossier_photo_updated', handlePhotoUpdated);
+      window.removeEventListener('vinay_dossier_photo_cleared', handlePhotoCleared);
+    };
+  }, []);
 
   // ScrollSpy to keep Nav Pill active state in sync
   useEffect(() => {
@@ -79,22 +115,6 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handlers for photos
-  const handleSelectPhoto = (id: string) => {
-    setActivePhotoId(id);
-  };
-
-  const handleAddCustomPhoto = (newPhoto: AthletePhoto) => {
-    setPhotosList(prev => [newPhoto, ...prev]);
-    setActivePhotoId(newPhoto.id);
-  };
-
-  const handleResetPhotos = () => {
-    localStorage.removeItem('vinay_portfolio_photos');
-    setPhotosList(ATHLETE_PHOTOS);
-    setActivePhotoId(ATHLETE_PHOTOS[0].id);
-  };
-
   return (
     <div className="min-h-screen bg-[#060807] text-[#F3F4F6] font-sans selection:bg-[#ffe600] selection:text-black antialiased relative">
       
@@ -109,10 +129,8 @@ export default function App() {
           profile={profile}
           photos={photosList}
           activePhotoId={activePhotoId}
-          onSelectPhoto={handleSelectPhoto}
-          onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
+          customPhotoSrc={customPhotoUrl}
           onOpenResumeModal={() => setIsResumeModalOpen(true)}
-          onAddCustomPhoto={handleAddCustomPhoto}
         />
 
         {/* Chapter 02: //brands (//BRANDS & OPERATIONS) */}
@@ -137,7 +155,6 @@ export default function App() {
         activeSection={activeSection}
         onNavigate={setActiveSection}
         onOpenResumeModal={() => setIsResumeModalOpen(true)}
-        onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
       />
 
       {/* Printable / Downloadable Official 1-Page Resume Modal */}
@@ -149,15 +166,19 @@ export default function App() {
         projects={projects}
       />
 
-      {/* High-Resolution Photo Upload & Gallery Modal */}
-      <PhotoUploadModal
-        isOpen={isPhotoModalOpen}
-        onClose={() => setIsPhotoModalOpen(false)}
-        photos={photosList}
-        activePhotoId={activePhotoId}
-        onSelectPhoto={handleSelectPhoto}
-        onAddCustomPhoto={handleAddCustomPhoto}
-        onResetPhotos={handleResetPhotos}
+      {/* Secret Owner Backend Photo Console (Hidden from public) */}
+      <SecretAdminModal
+        isOpen={isSecretAdminOpen}
+        onClose={() => {
+          setIsSecretAdminOpen(false);
+          // If hash is #admin, clear it without reload
+          if (window.location.hash.toLowerCase() === '#admin') {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }}
+        onPhotosUpdated={() => {
+          window.dispatchEvent(new Event('vinay_photos_updated'));
+        }}
       />
 
     </div>

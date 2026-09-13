@@ -15,7 +15,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   bio: 'Supply Chain & Operations professional specializing in Category Management, Vendor Management, and E-commerce Operations. Managed 20,000+ SKUs with 95% accuracy, spearheaded Bengaluru’s 30-minute Quick Commerce catalogue launch, and state-level track athlete (100m, 200m, 400m). Recipient of the 20% Pankaj Bansal Scholarship for Young Leaders at Masters’ Union.',
   contactEmail: 'vinay2027@mastersunion.org',
   phone: '+91 6360682258',
-  linkedin: 'https://linkedin.com/in/vinay-g',
+  linkedin: 'https://www.linkedin.com/in/vinay-g-7233b522b/',
   heroDisplayWord: 'RELENTLESS',
   captionText: 'SPEC // VINAY G — MASTERS\' UNION & ATHLETICS ARCHIVE'
 };

@@ -1,69 +1,110 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { InteractiveMark } from './InteractiveMark';
-import { TrendingUp, Users, ShoppingBag, Sparkles, Upload, Image as ImageIcon, CheckCircle2, Award, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, Users, ShoppingBag, Sparkles, CheckCircle2, Award, Camera, Upload, Trash2 } from 'lucide-react';
 
-interface DropshippingMelaShowcaseProps {
-  onOpenPhotoModal?: () => void;
-}
-
-export const DropshippingMelaShowcase: React.FC<DropshippingMelaShowcaseProps> = () => {
-  // Stored photos state from localStorage
+export const DropshippingMelaShowcase: React.FC = () => {
   const [photos, setPhotos] = useState<{ stallPhoto: string | null; teamPhoto: string | null }>(() => {
     try {
       const saved = localStorage.getItem('vinay_dropshipping_mela_photos');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Clean up any stale paths from previously deleted AI images
+        const cleanStall = parsed.stallPhoto && !parsed.stallPhoto.includes('mela_booth_photo_') ? parsed.stallPhoto : null;
+        const cleanTeam = parsed.teamPhoto && !parsed.teamPhoto.includes('mela_team_photo_') ? parsed.teamPhoto : null;
+        return { stallPhoto: cleanStall, teamPhoto: cleanTeam };
+      }
     } catch (e) {
       console.warn('Could not read mela photos from storage', e);
     }
     return { stallPhoto: null, teamPhoto: null };
   });
 
-  const [activeSlot, setActiveSlot] = useState<'stall' | 'team' | null>(null);
   const stallInputRef = useRef<HTMLInputElement>(null);
   const teamInputRef = useRef<HTMLInputElement>(null);
 
-  const handleUpload = (file: File, slot: 'stall' | 'team') => {
+  // Check server for saved persistent photos
+  useEffect(() => {
+    fetch('/api/mela-photos')
+      .then(res => res.json())
+      .then(data => {
+        setPhotos(prev => ({
+          stallPhoto: prev.stallPhoto || data.stall,
+          teamPhoto: prev.teamPhoto || data.team,
+        }));
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleFileUpload = (file: File, slot: 'stall' | 'team') => {
     if (!file.type.startsWith('image/')) return;
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      const updated = {
-        ...photos,
-        [slot === 'stall' ? 'stallPhoto' : 'teamPhoto']: result
-      };
-      setPhotos(updated);
+    reader.onload = async (e) => {
+      const dataUrl = e.target?.result as string;
+      const key = slot === 'stall' ? 'stallPhoto' : 'teamPhoto';
+
+      setPhotos(prev => {
+        const updated = { ...prev, [key]: dataUrl };
+        try {
+          localStorage.setItem('vinay_dropshipping_mela_photos', JSON.stringify(updated));
+        } catch (err) {
+          console.warn(err);
+        }
+        return updated;
+      });
+
+      // Send to server to write to disk permanently
       try {
-        localStorage.setItem('vinay_dropshipping_mela_photos', JSON.stringify(updated));
+        await fetch('/api/upload-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slot, dataUrl }),
+        });
       } catch (err) {
-        console.warn('Storage quota error', err);
+        console.warn('Backend upload failed, kept in local state', err);
       }
+
+      window.dispatchEvent(new Event('vinay_photos_updated'));
     };
     reader.readAsDataURL(file);
   };
 
-  return (
-    <div className="bg-[#081b12] border-2 border-[#ffe600]/40 rounded-3xl p-6 sm:p-10 mb-10 shadow-2xl relative overflow-hidden">
-      
-      {/* Hidden file inputs for direct drop or click */}
-      <input 
-        ref={stallInputRef} 
-        type="file" 
-        accept="image/*" 
-        className="hidden" 
-        onChange={(e) => {
-          if (e.target.files?.[0]) handleUpload(e.target.files[0], 'stall');
-        }} 
-      />
-      <input 
-        ref={teamInputRef} 
-        type="file" 
-        accept="image/*" 
-        className="hidden" 
-        onChange={(e) => {
-          if (e.target.files?.[0]) handleUpload(e.target.files[0], 'team');
-        }} 
-      />
+  const handleRemovePhoto = (slot: 'stall' | 'team', e: React.MouseEvent) => {
+    e.stopPropagation();
+    const key = slot === 'stall' ? 'stallPhoto' : 'teamPhoto';
+    setPhotos(prev => {
+      const updated = { ...prev, [key]: null };
+      localStorage.setItem('vinay_dropshipping_mela_photos', JSON.stringify(updated));
+      return updated;
+    });
+    window.dispatchEvent(new Event('vinay_photos_updated'));
+  };
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        const saved = localStorage.getItem('vinay_dropshipping_mela_photos');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const cleanStall = parsed.stallPhoto && !parsed.stallPhoto.includes('mela_booth_photo_') ? parsed.stallPhoto : null;
+          const cleanTeam = parsed.teamPhoto && !parsed.teamPhoto.includes('mela_team_photo_') ? parsed.teamPhoto : null;
+          setPhotos({ stallPhoto: cleanStall, teamPhoto: cleanTeam });
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    };
+
+    window.addEventListener('vinay_photos_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('vinay_photos_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
+  return (
+    <div className="bg-[#081b12] border-2 border-[#ffe600]/40 rounded-2xl p-5 sm:p-7 mb-2 shadow-2xl relative overflow-hidden">
+      
       {/* Decorative Bunting Header Stripe */}
       <div className="flex items-center justify-between pb-6 mb-6 border-b border-white/10 flex-wrap gap-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -163,57 +204,95 @@ export const DropshippingMelaShowcase: React.FC<DropshippingMelaShowcaseProps> =
             <Sparkles className="w-4 h-4" />
             <span>ON-GROUND EVENT ARCHIVE // DLF CYBERHUB BOOTH & TEAM</span>
           </div>
-          <span className="text-[10px] font-mono-code text-white/50">
-            Click any frame to upload or view original photo
+          <span className="text-[10px] font-mono-code text-emerald-400/90 font-bold flex items-center gap-1.5">
+            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+            <span>AUTHENTIC ON-GROUND RECORD</span>
           </span>
         </div>
+
+        {/* Hidden File Inputs */}
+        <input
+          ref={stallInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'stall')}
+        />
+        <input
+          ref={teamInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0], 'team')}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Photo Slot 1: Stall Photo */}
-          <div 
-            onClick={() => stallInputRef.current?.click()}
-            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (e.dataTransfer.files?.[0]) handleUpload(e.dataTransfer.files[0], 'stall');
-            }}
-            className="group relative bg-[#06120b] border border-white/15 hover:border-[#ffe600] rounded-2xl p-4 transition-all cursor-pointer shadow-lg"
-          >
+          <div className="relative bg-[#06120b] border border-white/15 rounded-2xl p-4 shadow-lg group">
             {/* Masking tape graphic */}
             <div className="absolute -top-2.5 left-8 w-24 h-5 bg-[#f3e7be]/90 border border-black/10 shadow-sm transform -rotate-2 z-10 text-[8px] font-mono-code text-black/60 flex items-center justify-center font-bold">
               BOOTH #INTHEUNION
             </div>
 
-            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/60 border border-white/10 mb-3 flex items-center justify-center">
+            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/80 border-2 border-dashed border-[#ffe600]/40 mb-3 flex items-center justify-center">
               {photos.stallPhoto ? (
-                <img 
-                  src={photos.stallPhoto} 
-                  alt="Vinay at Dropshipping Mela booth at DLF CyberHub" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center p-6 text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-[#ffe600]/10 border border-[#ffe600]/30 flex items-center justify-center text-[#ffe600] mb-3 group-hover:scale-110 transition-transform">
-                    <Upload className="w-6 h-6" />
+                <>
+                  <img 
+                    src={photos.stallPhoto} 
+                    alt="Vinay at Dropshipping Mela booth at DLF CyberHub" 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={() => {
+                      setPhotos(prev => ({ ...prev, stallPhoto: null }));
+                      try {
+                        const saved = localStorage.getItem('vinay_dropshipping_mela_photos');
+                        if (saved) {
+                          const p = JSON.parse(saved);
+                          delete p.stallPhoto;
+                          localStorage.setItem('vinay_dropshipping_mela_photos', JSON.stringify(p));
+                        }
+                      } catch (e) {}
+                    }}
+                  />
+                  {/* Hover controls to replace or remove */}
+                  <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-black/80 backdrop-blur-md p-1.5 rounded-lg border border-white/20 shadow-lg z-20">
+                    <button
+                      onClick={() => stallInputRef.current?.click()}
+                      className="px-2 py-1 rounded bg-[#ffe600] text-black text-xs font-bold font-mono-code flex items-center gap-1 hover:bg-[#ffe600]/90 transition-all cursor-pointer"
+                      title="Replace Photo"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Change</span>
+                    </button>
+                    <button
+                      onClick={(e) => handleRemovePhoto('stall', e)}
+                      className="p-1.5 rounded bg-red-500/20 hover:bg-red-500/40 text-red-400 transition-colors cursor-pointer"
+                      title="Remove Photo"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <span className="text-xs font-mono-code font-bold text-white uppercase tracking-wide">
-                    Add Pop-Up Booth Photo
+                </>
+              ) : (
+                <button
+                  onClick={() => stallInputRef.current?.click()}
+                  className="w-full h-full flex flex-col items-center justify-center p-6 text-center hover:bg-[#ffe600]/5 transition-all cursor-pointer group/btn"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-[#ffe600]/20 border-2 border-[#ffe600] flex items-center justify-center text-[#ffe600] mb-3 group-hover/btn:scale-110 transition-transform shadow-lg shadow-[#ffe600]/10">
+                    <Upload className="w-7 h-7" />
+                  </div>
+                  <span className="text-sm font-mono-code font-bold text-[#ffe600] uppercase tracking-wider mb-1">
+                    [ CLICK HERE TO UPLOAD BOOTH PHOTO ]
                   </span>
-                  <span className="text-[11px] text-white/60 font-mono-code mt-1 max-w-xs">
-                    Click or drop WhatsApp Image (Stall photo with bunting & gemstone counter)
+                  <span className="text-xs text-white/70 font-sans max-w-xs">
+                    Select your WhatsApp stall photo (<span className="text-white font-mono">15.32.19.jpeg</span>)
                   </span>
-                </div>
+                  <span className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#ffe600] text-black text-xs font-bold font-mono-code shadow">
+                    <Camera className="w-3.5 h-3.5" /> Browse File
+                  </span>
+                </button>
               )}
-
-              {/* Hover overlay hint */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-mono-code font-bold">
-                <span className="bg-black/80 px-3 py-1.5 rounded-lg border border-white/20">
-                  {photos.stallPhoto ? 'Click to Change Photo' : 'Click to Upload Photo'}
-                </span>
-              </div>
             </div>
 
             <div className="flex items-center justify-between text-xs font-mono-code">
@@ -228,49 +307,70 @@ export const DropshippingMelaShowcase: React.FC<DropshippingMelaShowcaseProps> =
           </div>
 
           {/* Photo Slot 2: Team Photo */}
-          <div 
-            onClick={() => teamInputRef.current?.click()}
-            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (e.dataTransfer.files?.[0]) handleUpload(e.dataTransfer.files[0], 'team');
-            }}
-            className="group relative bg-[#06120b] border border-white/15 hover:border-[#ffe600] rounded-2xl p-4 transition-all cursor-pointer shadow-lg"
-          >
+          <div className="relative bg-[#06120b] border border-white/15 rounded-2xl p-4 shadow-lg group">
             {/* Masking tape graphic */}
             <div className="absolute -top-2.5 right-8 w-24 h-5 bg-[#f3e7be]/90 border border-black/10 shadow-sm transform rotate-1 z-10 text-[8px] font-mono-code text-black/60 flex items-center justify-center font-bold">
               TEAM TAARA ✨
             </div>
 
-            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/60 border border-white/10 mb-3 flex items-center justify-center">
+            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/80 border-2 border-dashed border-emerald-400/40 mb-3 flex items-center justify-center">
               {photos.teamPhoto ? (
-                <img 
-                  src={photos.teamPhoto} 
-                  alt="Vinay with Team TAARA at DLF CyberHub" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center p-6 text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
-                    <Users className="w-6 h-6" />
+                <>
+                  <img 
+                    src={photos.teamPhoto} 
+                    alt="Vinay with Team TAARA at DLF CyberHub" 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={() => {
+                      setPhotos(prev => ({ ...prev, teamPhoto: null }));
+                      try {
+                        const saved = localStorage.getItem('vinay_dropshipping_mela_photos');
+                        if (saved) {
+                          const p = JSON.parse(saved);
+                          delete p.teamPhoto;
+                          localStorage.setItem('vinay_dropshipping_mela_photos', JSON.stringify(p));
+                        }
+                      } catch (e) {}
+                    }}
+                  />
+                  {/* Hover controls to replace or remove */}
+                  <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-black/80 backdrop-blur-md p-1.5 rounded-lg border border-white/20 shadow-lg z-20">
+                    <button
+                      onClick={() => teamInputRef.current?.click()}
+                      className="px-2 py-1 rounded bg-emerald-400 text-black text-xs font-bold font-mono-code flex items-center gap-1 hover:bg-emerald-300 transition-all cursor-pointer"
+                      title="Replace Photo"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Change</span>
+                    </button>
+                    <button
+                      onClick={(e) => handleRemovePhoto('team', e)}
+                      className="p-1.5 rounded bg-red-500/20 hover:bg-red-500/40 text-red-400 transition-colors cursor-pointer"
+                      title="Remove Photo"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <span className="text-xs font-mono-code font-bold text-white uppercase tracking-wide">
-                    Add Team TAARA Group Photo
+                </>
+              ) : (
+                <button
+                  onClick={() => teamInputRef.current?.click()}
+                  className="w-full h-full flex flex-col items-center justify-center p-6 text-center hover:bg-emerald-400/5 transition-all cursor-pointer group/btn"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-400/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-400 mb-3 group-hover/btn:scale-110 transition-transform shadow-lg shadow-emerald-400/10">
+                    <Upload className="w-7 h-7" />
+                  </div>
+                  <span className="text-sm font-mono-code font-bold text-emerald-400 uppercase tracking-wider mb-1">
+                    [ CLICK HERE TO UPLOAD TEAM PHOTO ]
                   </span>
-                  <span className="text-[11px] text-white/60 font-mono-code mt-1 max-w-xs">
-                    Click or drop WhatsApp Image (Evening team celebration & jewelry collage)
+                  <span className="text-xs text-white/70 font-sans max-w-xs">
+                    Select your WhatsApp team celebration photo (<span className="text-white font-mono">14.06.17.jpeg</span>)
                   </span>
-                </div>
+                  <span className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-400 text-black text-xs font-bold font-mono-code shadow">
+                    <Camera className="w-3.5 h-3.5" /> Browse File
+                  </span>
+                </button>
               )}
-
-              {/* Hover overlay hint */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-mono-code font-bold">
-                <span className="bg-black/80 px-3 py-1.5 rounded-lg border border-white/20">
-                  {photos.teamPhoto ? 'Click to Change Photo' : 'Click to Upload Photo'}
-                </span>
-              </div>
             </div>
 
             <div className="flex items-center justify-between text-xs font-mono-code">

@@ -134,8 +134,8 @@ export const ResumePortfolio: React.FC<ResumePortfolioProps> = ({
             <span className="text-[10px] font-mono-code uppercase tracking-wider text-amber-300">ATHLETICS</span>
             <Trophy className="w-4 h-4 text-amber-300" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black font-mono-code text-white">1ST / 70+</div>
-          <p className="text-xs text-neutral-400 mt-1">District 200m & 100m Gold Medalist & Khelo India Qualifier</p>
+          <div className="text-2xl sm:text-3xl font-black font-mono-code text-white">PODIUM</div>
+          <p className="text-xs text-neutral-400 mt-1">District 100m & 200m Gold, State 400m Silver & Khelo India Qualifier</p>
         </div>
       </div>
 

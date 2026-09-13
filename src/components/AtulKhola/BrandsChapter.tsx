@@ -9,7 +9,7 @@ interface BrandsChapterProps {
 
 export const BrandsChapter: React.FC<BrandsChapterProps> = ({ experiences }) => {
   return (
-    <section id="brands" className="py-12 sm:py-20 px-4 sm:px-8 lg:px-16 border-b border-white/10 relative">
+    <section id="brands" className="py-8 sm:py-12 px-4 sm:px-8 lg:px-12 border-b border-white/10 relative">
       
       {/* Chapter Label */}
       <div className="flex items-center gap-3 text-xs font-mono-code text-[#ffe600] font-bold uppercase tracking-widest mb-3">
@@ -18,186 +18,120 @@ export const BrandsChapter: React.FC<BrandsChapterProps> = ({ experiences }) => 
         <span className="text-white/30 hidden sm:inline">——— 02 // WHERE I HAVE OPERATED & BUILT</span>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-2 mb-10 pb-4 border-b border-white/10">
-        <h2 className="text-2xl sm:text-4xl font-extrabold uppercase font-display tracking-tight text-white">
-          EXPERIENCE & OPERATIONS TRACK RECORD
+      <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-2 mb-6 pb-3 border-b border-white/10">
+        <h2 className="text-xl sm:text-3xl font-extrabold uppercase font-display tracking-tight text-white">
+          OPERATIONS & EXPERIENCE TRACK RECORD
         </h2>
-        <p className="text-xs sm:text-sm font-mono-code text-white/60 max-w-md">
-          Leading category catalogue operations, instant quick-commerce launches, and emergency logistics across top FMCG conglomerates.
+        <p className="text-xs font-mono-code text-white/60">
+          Quick-commerce rollouts, 20,000+ SKUs, and enterprise procurement for Fortune-500 accounts.
         </p>
       </div>
 
-      {/* Brands Cards Stack */}
-      <div className="space-y-8">
+      {/* 2-Column Responsive Grid to keep vertical scroll tight */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Brand 1: Supertails */}
-        <div className="bg-[#0b2418] border border-white/15 hover:border-[#ffe600]/40 rounded-2xl p-6 sm:p-8 transition-all shadow-xl relative overflow-hidden">
-          
-          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 pb-6 border-b border-white/10 mb-6">
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <h3 className="text-2xl sm:text-3xl font-black font-display uppercase tracking-tight text-white">
-                  SUPERTAILS
-                </h3>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono-code bg-[#ffe600] text-black font-bold">
+        <div className="bg-[#0b2418] border border-white/15 hover:border-[#ffe600]/40 rounded-2xl p-5 sm:p-6 transition-all shadow-xl flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <h3 className="text-2xl font-black font-display uppercase tracking-tight text-white">
+                SUPERTAILS
+              </h3>
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono-code bg-[#ffe600] text-black font-bold">
                   FULL-TIME
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono-code bg-emerald-400/10 text-emerald-300 border border-emerald-400/20">
-                  FEB 2025 — MAR 2026
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono-code bg-emerald-400/10 text-emerald-300 border border-emerald-400/20">
+                  2025 — 2026
                 </span>
-              </div>
-              <h4 className="text-base font-bold text-white/90">
-                Catalogue & Merchandising Executive (Category Operations Lead)
-              </h4>
-              <div className="flex items-center gap-3 text-xs font-mono-code text-white/50 mt-1">
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-[#ffe600]" />
-                  Bengaluru, India
-                </span>
-                <span>•</span>
-                <span>Category: Pet Care FMCG & Quick Commerce</span>
               </div>
             </div>
 
-            {/* Top Brand Partnerships */}
-            <div className="flex flex-wrap items-center gap-1.5 max-w-sm">
-              <span className="text-[10px] font-mono-code text-[#ffe600] block w-full mb-0.5 font-bold">
-                PORTFOLIO BRANDS MANAGED:
-              </span>
-              {['Mars India', 'Nestlé India', 'Royal Canin', 'Drools', 'Farmina', '20+ Top Brands'].map((b) => (
-                <span key={b} className="text-[10px] font-mono-code px-2 py-0.5 rounded bg-black/40 border border-white/10 text-white/80">
+            <div className="text-sm font-bold text-white/90 mb-1">
+              Catalogue & Merchandising Executive (Category Lead)
+            </div>
+            <div className="text-xs font-mono-code text-white/50 mb-4">
+              Bengaluru, India • Pet Care FMCG & Quick Commerce
+            </div>
+
+            <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
+              Governed <strong className="text-white">20,000+ active SKUs</strong> maintaining 95% catalogue accuracy across Mars India, Nestlé, and Royal Canin. Orchestrated inventory mapping for 40+ fulfillment warehouses and staged 3,000+ priority SKUs for Bengaluru's <strong className="text-[#ffe600]">30-minute quick commerce delivery</strong> launch with zero downtime.
+            </p>
+
+            <div className="flex flex-wrap gap-1 mb-4">
+              {['Mars India', 'Nestlé', 'Royal Canin', 'Drools', '40+ Warehouses'].map((b) => (
+                <span key={b} className="text-[10px] font-mono-code px-2 py-0.5 rounded bg-black/40 border border-white/10 text-white/70">
                   {b}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Body Narrative with Interactive Marks */}
-          <div className="space-y-4 text-sm sm:text-base text-white/85 leading-relaxed font-sans mb-6">
-            <p>
-              I joined Supertails to lead catalogue operations across{' '}
-              <InteractiveMark 
-                text="20,000+ active SKUs" 
-                note="Maintained 95% accuracy across product attributes, ingredients, dimensions, and barcode mappings" 
-                badge="CATALOGUE GOVERNANCE"
-              />
-              . I structured and mapped inventory across{' '}
-              <InteractiveMark 
-                text="40+ fulfillment warehouses" 
-                note="Coordinated 6–7 daily inbound consignments with warehouse teams to prevent stockouts" 
-                badge="INBOUND LOGISTICS"
-              />
-              , processing over 50 Purchase Orders each month.
-            </p>
-
-            <p>
-              When Supertails greenlit instant delivery, I orchestrated the end-to-end catalogue rollout for{' '}
-              <InteractiveMark 
-                text="30-minute quick commerce delivery" 
-                note="Dark store inventory mapping across Bengaluru with real-time stock sync" 
-                badge="QUICK COMMERCE"
-              />
-              , staging 3,000+ essential SKUs for immediate dispatch.
-            </p>
-
-          </div>
-
-          {/* Quantified Metrics Ribbon */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/10 text-xs font-mono-code">
-            <div className="bg-black/30 p-3 rounded-xl border border-white/5">
-              <span className="text-[10px] text-white/50 block">ACCURACY RATE</span>
-              <span className="text-base font-bold text-[#ffe600]">95% SLA</span>
+          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-center font-mono-code">
+            <div className="bg-black/30 p-2 rounded-lg border border-white/5">
+              <div className="text-[9px] text-white/40">ACCURACY</div>
+              <div className="text-sm font-bold text-[#ffe600]">95% SLA</div>
             </div>
-            <div className="bg-black/30 p-3 rounded-xl border border-white/5">
-              <span className="text-[10px] text-white/50 block">LIVE SKUs</span>
-              <span className="text-base font-bold text-white">20,000+</span>
+            <div className="bg-black/30 p-2 rounded-lg border border-white/5">
+              <div className="text-[9px] text-white/40">CATALOGUE</div>
+              <div className="text-sm font-bold text-white">20K+ SKUs</div>
             </div>
-            <div className="bg-black/30 p-3 rounded-xl border border-white/5">
-              <span className="text-[10px] text-white/50 block">FULFILLMENT HUBS</span>
-              <span className="text-base font-bold text-emerald-400">40+ WAREHOUSES</span>
-            </div>
-            <div className="bg-black/30 p-3 rounded-xl border border-white/5">
-              <span className="text-[10px] text-white/50 block">MONTHLY POs</span>
-              <span className="text-base font-bold text-emerald-400">50+ ORDERS</span>
+            <div className="bg-black/30 p-2 rounded-lg border border-white/5">
+              <div className="text-[9px] text-white/40">Q-COMMERCE</div>
+              <div className="text-sm font-bold text-emerald-400">30-MIN</div>
             </div>
           </div>
-
         </div>
 
         {/* Brand 2: Printo */}
-        <div className="bg-[#0b2418] border border-white/15 hover:border-white/30 rounded-2xl p-6 sm:p-8 transition-all shadow-xl relative overflow-hidden">
-          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 pb-6 border-b border-white/10 mb-6">
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <h3 className="text-2xl sm:text-3xl font-black font-display uppercase tracking-tight text-white">
-                  PRINTO
-                </h3>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono-code bg-blue-500/20 text-blue-300 font-bold border border-blue-400/20">
+        <div className="bg-[#0b2418] border border-white/15 hover:border-white/30 rounded-2xl p-5 sm:p-6 transition-all shadow-xl flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <h3 className="text-2xl font-black font-display uppercase tracking-tight text-white">
+                PRINTO
+              </h3>
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono-code bg-blue-500/20 text-blue-300 font-bold border border-blue-400/20">
                   INTERNSHIP
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono-code bg-white/5 text-white/60">
-                  AUG 2023 — DEC 2023
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono-code bg-white/5 text-white/60">
+                  AUG — DEC 2023
                 </span>
-              </div>
-              <h4 className="text-base font-bold text-white/90">
-                Cataloging Intern (Bespoke Corporate Merchandising & Gifting)
-              </h4>
-              <div className="flex items-center gap-3 text-xs font-mono-code text-white/50 mt-1">
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-[#ffe600]" />
-                  Bengaluru, India
-                </span>
-                <span>•</span>
-                <span>Clients: Google, Meta & Enterprise Accounts</span>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5 max-w-sm">
-              <span className="text-[10px] font-mono-code text-[#ffe600] block w-full mb-0.5 font-bold">
-                KEY ENTERPRISE ACCOUNTS:
-              </span>
-              {['Google', 'Meta', 'Fortune-500 Clients', '10+ Vetted Sourcing Vendors'].map((c) => (
-                <span key={c} className="text-[10px] font-mono-code px-2 py-0.5 rounded bg-black/40 border border-white/10 text-white/80">
+            <div className="text-sm font-bold text-white/90 mb-1">
+              Cataloging Executive (Corporate Merchandising)
+            </div>
+            <div className="text-xs font-mono-code text-white/50 mb-4">
+              Bengaluru, India • Enterprise Accounts
+            </div>
+
+            <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
+              Managed bespoke corporate procurement and custom catalogue execution for premier technology accounts including <strong className="text-white">Google and Meta</strong>. Executed the 2023 festive gifting campaign of <strong className="text-[#ffe600]">10,000+ orders</strong> across 40+ personalized solution packages with 100% on-time dispatch SLA.
+            </p>
+
+            <div className="flex flex-wrap gap-1 mb-4">
+              {['Google', 'Meta', '10K+ Orders', '40+ Packages', '10+ Vetted Vendors'].map((c) => (
+                <span key={c} className="text-[10px] font-mono-code px-2 py-0.5 rounded bg-black/40 border border-white/10 text-white/70">
                   {c}
                 </span>
               ))}
             </div>
           </div>
 
-          <div className="space-y-4 text-sm sm:text-base text-white/85 leading-relaxed font-sans mb-6">
-            <p>
-              At Printo, I specialized in high-touch corporate procurement and merchandise cataloging for premier technology accounts like{' '}
-              <InteractiveMark 
-                text="Google and Meta" 
-                note="Delivered bespoke customized kits adhering to strict global corporate brand guidelines" 
-                badge="KEY CLIENTS"
-              />
-              .
-            </p>
-
-            <p>
-              I managed end-to-end logistics for the high-volume 2023 Diwali gifting campaign:{' '}
-              <InteractiveMark 
-                text="10,000+ orders executed" 
-                note="Sourced 20–30 unique SKUs, created 40+ personalized solution bundles, and sustained 100% on-time dispatch" 
-                badge="SEASONAL CAMPAIGN"
-              />
-              {' '}while coordinating pricing, proofing, and SLA commitments with 10+ external fabrication vendors.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-white/10 text-xs font-mono-code">
-            <div className="bg-black/30 p-3 rounded-xl border border-white/5">
-              <span className="text-[10px] text-white/50 block">CAMPAIGN VOLUME</span>
-              <span className="text-base font-bold text-white">10,000+ ORDERS</span>
+          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-center font-mono-code">
+            <div className="bg-black/30 p-2 rounded-lg border border-white/5">
+              <div className="text-[9px] text-white/40">ORDERS</div>
+              <div className="text-sm font-bold text-white">10K+</div>
             </div>
-            <div className="bg-black/30 p-3 rounded-xl border border-white/5">
-              <span className="text-[10px] text-white/50 block">BESPOKE PACKAGES</span>
-              <span className="text-base font-bold text-[#ffe600]">40+ SOLUTIONS</span>
+            <div className="bg-black/30 p-2 rounded-lg border border-white/5">
+              <div className="text-[9px] text-white/40">SOLUTIONS</div>
+              <div className="text-sm font-bold text-[#ffe600]">40+ PKGS</div>
             </div>
-            <div className="bg-black/30 p-3 rounded-xl border border-white/5 col-span-2 sm:col-span-1">
-              <span className="text-[10px] text-white/50 block">SOURCING NETWORK</span>
-              <span className="text-base font-bold text-blue-300">10+ VENDORS</span>
+            <div className="bg-black/30 p-2 rounded-lg border border-white/5">
+              <div className="text-[9px] text-white/40">CLIENTS</div>
+              <div className="text-sm font-bold text-blue-300">GOOGLE/META</div>
             </div>
           </div>
         </div>

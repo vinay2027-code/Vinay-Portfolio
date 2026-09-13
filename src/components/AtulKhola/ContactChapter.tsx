@@ -24,7 +24,7 @@ export const ContactChapter: React.FC<ContactChapterProps> = ({ profile, onOpenR
   };
 
   return (
-    <section id="contact" className="py-12 sm:py-20 px-4 sm:px-8 lg:px-16 relative">
+    <section id="contact" className="py-8 sm:py-12 px-4 sm:px-8 lg:px-12 relative">
       
       {/* Chapter Label */}
       <div className="flex items-center gap-3 text-xs font-mono-code text-[#ffe600] font-bold uppercase tracking-widest mb-3">
@@ -33,18 +33,18 @@ export const ContactChapter: React.FC<ContactChapterProps> = ({ profile, onOpenR
         <span className="text-white/30 hidden sm:inline">——— 05 // GET IN TOUCH</span>
       </div>
 
-      <div className="max-w-4xl space-y-6 mb-12">
-        <h2 className="text-3xl sm:text-5xl font-black font-display uppercase tracking-tight text-white leading-tight">
-          HAVE A HIGH-VELOCITY CATEGORY TO SCALE OR A SPORTS BUSINESS TO BUILD?
+      <div className="max-w-3xl space-y-3 mb-6">
+        <h2 className="text-2xl sm:text-4xl font-black font-display uppercase tracking-tight text-white leading-tight">
+          HAVE A HIGH-VELOCITY CATEGORY TO SCALE OR VENTURE TO BUILD?
         </h2>
         
-        <p className="text-base sm:text-xl text-white/80 leading-relaxed font-sans">
-          I’m actively looking to connect with founders, category heads, and sports organizations building bold products. Let’s talk supply chain, quick commerce, retail ventures, or sports business operations.
+        <p className="text-sm sm:text-base text-white/80 leading-relaxed font-sans">
+          I’m actively connecting with founders, category heads, and sports organizations. Let’s talk supply chain, quick commerce, retail ventures, or sports business operations.
         </p>
       </div>
 
       {/* Contact Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         
         {/* Email Card with Copy Button */}
         <div className="bg-[#0b2418] border border-white/10 hover:border-[#ffe600]/40 rounded-2xl p-5 flex flex-col justify-between transition-colors shadow-lg">
@@ -150,8 +150,10 @@ export const ContactChapter: React.FC<ContactChapterProps> = ({ profile, onOpenR
 
       {/* Colophon & Back to Top */}
       <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono-code text-white/40">
-        <div>
+        <div className="flex items-center gap-3">
           <span>© {new Date().getFullYear()} VINAY G</span>
+          <span className="text-white/20">•</span>
+          <span className="text-white/50">CATEGORY OPERATIONS & ATHLETICS</span>
         </div>
 
         <button

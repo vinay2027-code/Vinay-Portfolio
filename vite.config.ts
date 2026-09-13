@@ -57,6 +57,73 @@ function aistudioMediaPlugin(): Plugin {
             // Fall through if URI decoding or file access fails
           }
         }
+
+        // Custom photo upload endpoint for Vinay's authentic photos
+        if (req.url === '/api/upload-photo' && req.method === 'POST') {
+          let body = '';
+          req.on('data', chunk => { body += chunk; });
+          req.on('end', () => {
+            try {
+              const { slot, dataUrl } = JSON.parse(body);
+              if (!slot || !dataUrl) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'Missing slot or dataUrl' }));
+                return;
+              }
+              const slotFiles: Record<string, string> = {
+                stall: 'dlf_stall.jpg',
+                team: 'dlf_team.jpg',
+                blinkit: 'gig_blinkit.jpg',
+                auto: 'gig_auto.jpg',
+                delivery: 'gig_delivery.jpg',
+              };
+              const filename = slotFiles[slot] || `${slot}.jpg`;
+              const publicDir = path.resolve(__dirname, 'public', 'assets');
+              const srcDir = path.resolve(__dirname, 'src', 'assets', 'images');
+              if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+              if (!fs.existsSync(srcDir)) fs.mkdirSync(srcDir, { recursive: true });
+
+              // Strip base64 prefix
+              const matches = dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+              const buffer = matches ? Buffer.from(matches[2], 'base64') : Buffer.from(dataUrl, 'base64');
+
+              fs.writeFileSync(path.resolve(publicDir, filename), buffer);
+              fs.writeFileSync(path.resolve(srcDir, filename), buffer);
+
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success: true, url: `/assets/${filename}?t=${Date.now()}` }));
+            } catch (err: any) {
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: err.message }));
+            }
+          });
+          return;
+        }
+
+        if (req.url === '/api/mela-photos' && req.method === 'GET') {
+          const stallExists = fs.existsSync(path.resolve(__dirname, 'public', 'assets', 'dlf_stall.jpg'));
+          const teamExists = fs.existsSync(path.resolve(__dirname, 'public', 'assets', 'dlf_team.jpg'));
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({
+            stall: stallExists ? `/assets/dlf_stall.jpg` : null,
+            team: teamExists ? `/assets/dlf_team.jpg` : null,
+          }));
+          return;
+        }
+
+        if (req.url === '/api/gig-photos' && req.method === 'GET') {
+          const blinkitExists = fs.existsSync(path.resolve(__dirname, 'public', 'assets', 'gig_blinkit.jpg'));
+          const autoExists = fs.existsSync(path.resolve(__dirname, 'public', 'assets', 'gig_auto.jpg'));
+          const deliveryExists = fs.existsSync(path.resolve(__dirname, 'public', 'assets', 'gig_delivery.jpg'));
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({
+            blinkit: blinkitExists ? `/assets/gig_blinkit.jpg` : null,
+            auto: autoExists ? `/assets/gig_auto.jpg` : null,
+            delivery: deliveryExists ? `/assets/gig_delivery.jpg` : null,
+          }));
+          return;
+        }
+
         next();
       });
     },
