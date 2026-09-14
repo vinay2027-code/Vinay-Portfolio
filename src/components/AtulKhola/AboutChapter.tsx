@@ -18,8 +18,10 @@ export const AboutChapter: React.FC<AboutChapterProps> = ({
   customPhotoSrc,
   onOpenResumeModal,
 }) => {
+  const [imgLoadError, setImgLoadError] = React.useState(false);
   const currentPhoto = photos.find(p => p.id === activePhotoId) || photos[0];
-  const imgSrc = customPhotoSrc || currentPhoto.imageSrc || (currentPhoto as any).url || '';
+  const primarySrc = customPhotoSrc || currentPhoto.imageSrc || (currentPhoto as any).url || '';
+  const displaySrc = imgLoadError ? (photos.find(p => p.id !== activePhotoId)?.imageSrc || primarySrc) : primarySrc;
 
   return (
     <section id="about" className="py-8 sm:py-12 px-4 sm:px-8 lg:px-12 border-b border-white/10 relative">
@@ -134,10 +136,11 @@ export const AboutChapter: React.FC<AboutChapterProps> = ({
               
               <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-neutral-900 shadow-inner">
                 <img
-                  src={imgSrc}
+                  src={displaySrc}
                   alt={currentPhoto.alt || currentPhoto.title}
                   className="w-full h-full object-cover object-top"
                   referrerPolicy="no-referrer"
+                  onError={() => setImgLoadError(true)}
                 />
 
                 {/* Sub-label badge */}

@@ -1,6 +1,5 @@
 import { InfoBadge, ColorwayBand, AthletePhoto } from '../types';
 
-import vinayExecutive from '../assets/images/P1054355.JPG';
 import vinay1 from '../assets/images/vinay_hero_portrait_1789032472927.jpg';
 import vinay2 from '../assets/images/vinay_locker_room_1789032504110.jpg';
 import vinay3 from '../assets/images/vinay_pitch_walk_1789032528483.jpg';
@@ -10,7 +9,7 @@ export const ATHLETE_PHOTOS: AthletePhoto[] = [
     id: 'vinay-executive-suit',
     title: 'Vinay G // Category Operations Executive',
     sport: 'Operations Leader // Masters\' Union',
-    imageSrc: vinayExecutive,
+    imageSrc: '/P1054355.JPG',
     alt: 'Vinay G in tailored dark suit with crossed arms (P1054355)',
     credit: 'P1054355 // 2026'
   },
